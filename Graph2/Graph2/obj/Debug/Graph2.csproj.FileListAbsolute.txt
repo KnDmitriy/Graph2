@@ -1,0 +1,6 @@
+C:\Users\konorovda\source\repos\Graph2\Graph2\bin\Debug\Graph2.exe.config
+C:\Users\konorovda\source\repos\Graph2\Graph2\bin\Debug\Graph2.exe
+C:\Users\konorovda\source\repos\Graph2\Graph2\bin\Debug\Graph2.pdb
+C:\Users\konorovda\source\repos\Graph2\Graph2\obj\Debug\Graph2.csprojAssemblyReference.cache
+C:\Users\konorovda\source\repos\Graph2\Graph2\obj\Debug\Graph2.exe
+C:\Users\konorovda\source\repos\Graph2\Graph2\obj\Debug\Graph2.pdb
