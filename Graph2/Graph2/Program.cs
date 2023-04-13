@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,8 +11,12 @@ namespace Graph2
         static void Main(string[] args)
         {
             Graph g = new Graph(@"C:\Users\konorovda\Desktop\File input output\Graph2\input1.txt");
-            g.SearchG();
-
+            int v;
+            Console.Write("v = ");
+            v = int.Parse(Console.ReadLine());
+            g.SearchG(v);
+            Console.WriteLine();
+            Console.WriteLine(g.IsExistEulerPath());
             Console.ReadKey();
 
         }
