@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 
@@ -61,6 +61,20 @@ namespace Graph2
                     if (array[v, u] != 0 && nov[u])
                     {
                         Dfs(u); // то рекурсивно просматриваем вершину
+                    }
+                }
+            }
+
+            public void DfsWithoutOutput(int v)
+            {
+                nov[v] = false; //помечаем ее как просмотренную
+                                // в матрице смежности просматриваем строку с номером v
+                for (int u = 0; u < Size; u++)
+                {
+                    //если вершины v и u смежные, к тому же вершина u не просмотрена,
+                    if (array[v, u] != 0 && nov[u])
+                    {
+                        DfsWithoutOutput(u); // то рекурсивно просматриваем вершину
                     }
                 }
             }
@@ -219,6 +233,65 @@ namespace Graph2
                     WayFloyd(k, b, p, ref items);
                 }
             }
+            public bool IsExistEulerPath() //v - вершина, с которой начинается путь
+            {
+                //Эйлеров цикл/путь может  существовать только в связных  графах (графах, в которых между любой парой вершин существует как минимум один путь) 
+                //или в графах, которые после удаления всех одиночных вершин превратятся в связные.
+                //Эйлеров путь в графе существует тогда и только тогда, когда граф связный и содержит не более двух вершин нечётной степени.
+
+
+                //Нам не нужно просматривать одиночные вершины, так как их наличие не отменяет существования эйлерова пути/цикла.
+                //Поэтому пометим одиночные вершины уже рассмотренными. Если мы этого не сделаем, то IsExistEulerPath() всегда будет выдавать false, 
+                //так как граф будет несвязным, за исключением случая, когда нам дан граф состоящий из одной единичной вершины, в этом случае IsExistEulerPath() выдаст true.
+                for (int i = 0; i < Size; ++i)
+                {
+                    bool isItSingleNode = true;
+                    //в неор. графе если все элементы строки или столбца матрицы смежности равны нулю, то это нулевая вершина
+                    for (int j = 0; j < Size; ++j)
+                    {
+                        isItSingleNode = isItSingleNode && !Convert.ToBoolean(array[i, j]);
+                    }
+                    if(isItSingleNode)
+                    {
+                        nov[i] = false;//если i-я вершина одиночная, то помечаем ее как просмотреннуюю
+                    }
+                }
+                DfsWithoutOutput(0);//для заполнения миссива nov для понимания, одна ли здесь компонента связности
+                //если компонент связности больше одной (т.е. граф не связный) при условии, что все одиночные вершины не учитываются, то в графе не может быть эйлерова пути 
+                //по критерию существования эйлерова графа
+                bool isGraphConnected = true;//является ли граф связным
+                for(int i = 0; i < Size; ++i)
+                {
+                    isGraphConnected = isGraphConnected && !nov[i];
+                }
+                if(!isGraphConnected)
+                {
+                    return false;
+                }
+                
+                int nodesWithOddDeg = 0; //количество вершин с нечетной степенью
+                for(int i = 0; i < Size; ++i)
+                {
+                    int deg = 0;//степень вершины
+                    for(int j = 0; j < Size; ++j)
+                    {
+                        if(array[i, j] > 0) 
+                        {
+                            ++deg;
+                        }
+                    }
+                    if(deg % 2 == 1)
+                    {
+                        ++nodesWithOddDeg;
+                    }
+                    if(nodesWithOddDeg >= 3)//граф содержит более 2х вершин нечетной степени
+                    {
+                        return false;
+                    }
+                }
+                return true; 
+
+            }
             public void ShowIncommingNodes(int numOfNode)
             {
                 for (int i = 0; i < Size; ++i)
@@ -235,7 +308,8 @@ namespace Graph2
                 {
                     if (a[v, i] != 0)
                     {
-                        a[v, i] = 0; a[i, v] = 0;
+                        a[v, i] = 0; 
+                        a[i, v] = 0;
                         SearchG(i, ref a, ref c);
                     }
                 }
@@ -248,7 +322,7 @@ namespace Graph2
             using (StreamReader file = new StreamReader(name))
             {
                 char[] div = { ' ' };
-               
+
                 //if (file.ReadLine() != null)
                 //{
                 int n = int.Parse(file.ReadLine());
@@ -266,8 +340,8 @@ namespace Graph2
                 //}
                 //else
                 //{
-                 //   Console.WriteLine("Входной файл пуст");
-                 //   Console.ReadKey();
+                //   Console.WriteLine("Входной файл пуст");
+                //   Console.ReadKey();
                 //}
             }
         }
@@ -291,6 +365,11 @@ namespace Graph2
         {
             return graph.GetArray();
         }
+        public bool IsExistEulerPath()
+        {
+            graph.NovSet();
+            return graph.IsExistEulerPath();
+        }
         public void Dfs(int v)
         {
             graph.NovSet();//помечаем все вершины графа как непросмотренные
@@ -303,21 +382,54 @@ namespace Graph2
             graph.Bfs(v); //запускаем алгоритм обхода графа в ширину
             Console.WriteLine();
         }
-        public void SearchG() //поиск Эйлерова графа
+        public void SearchG(int v) //поиск Эйлерова пути. Выводит Эйлеров путь
         {
-            int[,] a = new int[graph.Size, graph.Size];
-            for (int i = 0; i < graph.Size; i++)
+
+
+            //bool[] nov1 = new bool[graph.Size];
+            //for (int i = 0; i < graph.Size; ++i)
+            //{
+            //    bool isItSingleNode = true;
+            //    for (int j = 0; j < graph.Size; ++j)
+            //    {
+            //        isItSingleNode = isItSingleNode && !Convert.ToBoolean(a[i, j]);
+            //    }
+
+            //}
+            //for (int i = 0; i < graph.Size; i++)
+            //{
+            //    bool isItSingleNode = true;
+            //    for (int j = 0; j < graph.Size; ++j)
+            //    {
+            //        isItSingleNode = isItSingleNode && !Convert.ToBoolean(a[i, j]);
+            //    }
+
+            //    for (int j = 0; j < graph.Size; j++)
+            //    {
+            //        if (!isItSingleNode) //записываем только неодиночные вершины
+            //            a[i, j] = graph[i, j];
+            //    }
+            //}
+            if (IsExistEulerPath())
             {
-                for (int j = 0; j < graph.Size; j++)
+                int[,] a = new int[graph.Size, graph.Size];
+                for (int i = 0; i < graph.Size; i++)
                 {
-                    a[i, j] = graph[i, j];
+                    for (int j = 0; j < graph.Size; j++)
+                    {
+                        a[i, j] = graph[i, j];
+                    }
+                }
+                Stack c = new Stack();
+                graph.SearchG(v, ref a, ref c);//в стек записывается эйлеров путь вобратном порядке
+                while (!c.IsEmpty)
+                {
+                    Console.Write("{0} ", (int)c.Pop());
                 }
             }
-            Stack c = new Stack();
-            graph.SearchG(0, ref a, ref c);
-            while (!c.IsEmpty)
+            else
             {
-                Console.Write("{0} ", (int)c.Pop() + 1);
+                Console.WriteLine("Эйлерова пути не существует для данного графа");
             }
         }
         public void Dijkstr(int v)
