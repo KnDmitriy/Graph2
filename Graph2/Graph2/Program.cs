@@ -10,13 +10,13 @@ namespace Graph2
     {
         static void Main(string[] args)
         {
-            Graph g = new Graph(@"C:\Users\konorovda\Desktop\File input output\Graph2\input1.txt");
+            Graph g = new Graph(@"/Users/DmitryKonorov/Projects/Graph2/Graph2/input1.txt");
             int v;
             Console.Write("v = ");
             v = int.Parse(Console.ReadLine());
-            g.SearchG(v);
+            g.SearchEulerPath(v);
             Console.WriteLine();
-            Console.WriteLine(g.IsExistEulerPath());
+            //Console.WriteLine(g.IsExistEulerPath());
             Console.ReadKey();
 
         }
